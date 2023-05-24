@@ -37,7 +37,7 @@ class OrderList : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityOrderListBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        var total = intent.getStringExtra("total")
+        var total = intent.getStringExtra("alltotal")
         var name = intent.getStringExtra("name")
         val email = getSharedPreferences("user", Context.MODE_PRIVATE).getString("email", "").toString()
 
@@ -66,6 +66,8 @@ class OrderList : AppCompatActivity() {
             }
 
         })
+
+        binding.txtTotal.text = total.toString()
 
     }
 

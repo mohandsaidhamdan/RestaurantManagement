@@ -127,6 +127,7 @@ class OrderDetailes : AppCompatActivity() {
         db = Firebase.firestore
         db.collection("orders").add(data).addOnSuccessListener {
             val i= Intent(this@OrderDetailes , OrderList::class.java)
+            i.putExtra("alltotal",alltotal)
             startActivity(i)
         }
     }
