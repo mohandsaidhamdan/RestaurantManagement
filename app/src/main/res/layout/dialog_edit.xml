@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="wrap_content"
+    android:background="@drawable/dialog_window"
+    android:layout_gravity="center"
+    android:layout_height="wrap_content">
+
+    <EditText
+        android:id="@+id/edit_name"
+        android:layout_marginTop="22dp"
+        android:layout_width="300dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_height="38dp"
+        android:textColorHint="#88807B"
+        android:layout_gravity="center"
+        android:background="@drawable/rounded_edittext_register_login"
+        android:ems="10"
+        android:hint="Name"
+
+        android:paddingLeft="16dp"
+        android:textColor="#222021"
+
+        android:maxLength="35"
+        android:inputType="textPersonName|textCapWords"
+        />
+
+
+
+
+
+
+
+    <EditText
+        android:id="@+id/edit_phone"
+        android:layout_width="300dp"
+        android:layout_height="38dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/rounded_edittext_register_login"
+        android:ems="10"
+        android:hint="Phone"
+        android:inputType="phone"
+        android:paddingLeft="16dp"
+        android:textColor="#222021"
+        android:textColorHint="#88807B"
+
+        />
+
+    <EditText
+        android:id="@+id/edit_birthday"
+        android:layout_width="300dp"
+        android:layout_height="38dp"
+        android:textColorHint="#88807B"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/rounded_edittext_register_login"
+        android:ems="10"
+        android:hint="Birthday"
+        android:paddingLeft="16dp"
+        android:textColor="#222021"
+        android:inputType="date"
+
+        />
+
+    <EditText
+        android:id="@+id/edit_address"
+        android:layout_width="300dp"
+        android:layout_height="38dp"
+        android:layout_gravity="center"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="22dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/rounded_edittext_register_login"
+        android:ems="10"
+        android:hint="Address"
+        android:inputType="textPersonName"
+        android:maxLength="35"
+        android:paddingLeft="16dp"
+        android:textColor="#222021"
+
+        android:textColorHint="#88807B" />
+
+    <Button
+        android:id="@+id/edit_button"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/rounded_button"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:text="Update"
+        android:layout_marginBottom="30dp"
+        android:textStyle="bold">
+
+    </Button>
+
+
+
+
+</LinearLayout>
