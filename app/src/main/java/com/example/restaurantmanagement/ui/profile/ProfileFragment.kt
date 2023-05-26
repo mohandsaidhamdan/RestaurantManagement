@@ -45,9 +45,6 @@ class ProfileFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val notificationsViewModel =
-            ViewModelProvider(this).get(ProfileViewModel::class.java)
-
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
 
         db = Firebase.firestore
@@ -62,18 +59,32 @@ class ProfileFragment : Fragment() {
                 .putBoolean("check", false).apply()
         }
 //        =============End logout================
-
-
         binding.btnEdit.setOnClickListener {
             showbottomDilaog()
         }
         binding.btnEdit.setOnClickListener {
             showbottomDilaog()
         }
+
         val email = requireContext().getSharedPreferences("user", Context.MODE_PRIVATE)
             .getString("email", "").toString()
-        Toast.makeText(context, email, Toast.LENGTH_SHORT).show()
-        getProfileData(email)
+        db.collection("users").whereEqualTo("email", email).get().addOnSuccessListener {
+            for (data in it) {
+                val oldName = data.getString("name")
+                val oldbirthday = data.getString("birthday")
+                val oldaddress = data.getString("address")
+                val oldphone = data.getString("phone")
+                val oldemail = data.getString("email")
+
+                binding.profileUsername.text = oldName.toString()
+                binding.profileName.text = oldName.toString()
+                binding.profileBirthday.text = oldbirthday.toString()
+                binding.profileAddress.text = oldaddress.toString()
+                binding.profilePhone.text = oldphone.toString()
+                binding.profileEmail.text = oldemail.toString()
+            }
+        }
+
 
         return binding.root
     }
@@ -179,23 +190,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun getProfileData(email: String) {
-        db.collection("users").whereEqualTo("email", email).get().addOnSuccessListener {
-            for (data in it) {
-                val id = data.id
-                val oldName = data.getString("name")
-                val oldbirthday = data.getString("birthday")
-                val oldaddress = data.getString("address")
-                val oldphone = data.getString("phone")
 
-                binding.profileUsername.text = oldName.toString()
-                binding.profileName.text = oldName.toString()
-                binding.profileBirthday.text = oldbirthday.toString()
-                binding.profileAddress.text = oldaddress.toString()
-                binding.profilePhone.text = oldphone.toString()
-
-
-            }
-        }.addOnFailureListener { }
     }
 
     private fun refreshFragment(context: Context) {

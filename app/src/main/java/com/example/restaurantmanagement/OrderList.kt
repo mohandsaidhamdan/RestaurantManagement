@@ -170,7 +170,10 @@ fun ListAdapter(option :  FirestoreRecyclerOptions<Order>){
 
     override fun onBackPressed() {
         super.onBackPressed()
-        startActivity(Intent(this , MainActivity::class.java))
+        val name = intent.getStringExtra("name")
+        val i= Intent(this , OrderDetailes::class.java)
+        i.putExtra("name",name)
+        startActivity(i)
     }
 
 }

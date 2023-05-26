@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.restaurantmanagement.*
 import com.example.restaurantmanagement.databinding.FragmentMenuBinding
 import com.example.restaurantmanagement.model.Meal
+import com.example.restaurantmanagement.model.Resturant
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.firestore.FirebaseFirestore
@@ -31,6 +32,7 @@ class MenuFragment : Fragment() {
     val storage = FirebaseStorage.getInstance()
     var typeAccount : String = ""
     var MEAL_ID = ""
+    lateinit var recyclerView: RecyclerView
 
 private var _binding: FragmentMenuBinding? = null
   // This property is only valid between onCreateView and
@@ -53,7 +55,7 @@ private var _binding: FragmentMenuBinding? = null
 
       //        Start Adapter
       db = Firebase.firestore
-      val recycler = binding.rvMeals
+      recyclerView = binding.rvMeals
 
       val query = db.collection("meals").orderBy("rate", Query.Direction.DESCENDING)
 
@@ -77,86 +79,10 @@ private var _binding: FragmentMenuBinding? = null
               .build()
 
 //        Adapter Take option
-      Adapter = object : FirestoreRecyclerAdapter<Meal, meal_item>(option) {
-          override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): meal_item {
-              var view = LayoutInflater.from(context)
-                  .inflate(R.layout.show_meals, parent, false)
-              return meal_item(view)
-          }
+ListAdapter(option)
 
-          override fun onBindViewHolder(holder: meal_item, position: Int, model: Meal) {
-              val name = model.name
-              val description = model.description
-          val resturantName = model.resturantName
-              val rate = model.rate
-              val image = model.image
-              val price = model.price
-
-              holder.name.text = name
-              holder.price.text = price.toString()
-              holder.description.text = description
-             holder.resturantName.text = resturantName
-              holder.rate.rating = rate
-
-              //                Delete
-              holder.image.setOnLongClickListener { _ ->
-                  Toast.makeText(context, typeAccount, Toast.LENGTH_SHORT).show()
-                  if (typeAccount == "admin") {
-                      val dilalog = AlertDialog.Builder(context)
-                      dilalog.setTitle("Delete Account")
-                      dilalog.setMessage("You Are Sure Delete Account ??")
-                      dilalog.setPositiveButton("Delete") { dialog, which ->
-                          // Do something when the positive button is clicked
-                          getidDelete(model.name)
-                          Toast.makeText(context, "Deleted Successfully", Toast.LENGTH_SHORT).show()
-                          dialog.dismiss()
-
-                      }
-                      dilalog.setNegativeButton("Cancel") { dialog, which ->
-                          // Do something when the negative button is clicked
-                          dialog.dismiss()
-
-                      }
-                      dilalog.show()
-                  }
-
-                  true
-              }
-
-              holder.edit.setOnClickListener {
-                  val i = Intent(context, EditMeal::class.java)
-                  i.putExtra("name", model.name)
-                  startActivity(i)
-
-              }
-
-              holder.order.setOnClickListener{
-                  val i = Intent(context, OrderDetailes::class.java)
-                  i.putExtra("name", model.name)
-                  getIDMeal(model.name)
-                  i.putExtra("id", MEAL_ID)
-                  startActivity(i)
-              }
-              //      ======== Start cheked acount type to permations ===
-              val  email = requireActivity().getSharedPreferences("user" , Context.MODE_PRIVATE).getString("email" , "").toString()
-              if (email == "admin@gmail.com") {
-                 holder.edit.visibility = View.VISIBLE
-              }
-              else {
-                 holder.edit.visibility = View.GONE
-              }
-              //      ======== End cheked acount type to permations ===
-
-
-              DwnloadImage(image, holder.image)
-
-          }
-
-
-      }
-
-      recycler.layoutManager = LinearLayoutManager(context)
-      recycler.adapter = Adapter
+      recyclerView.layoutManager = LinearLayoutManager(context)
+      recyclerView.adapter = Adapter
 
       //        End Adapter
 
@@ -167,9 +93,33 @@ private var _binding: FragmentMenuBinding? = null
       }
 
 
+
+      binding.search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+          override fun onQueryTextSubmit(p0: String?): Boolean {
+              return false
+          }
+
+          override fun onQueryTextChange(p0: String?): Boolean {
+
+              searchList(p0.toString())
+              return true
+          }
+
+      })
+
       return root
 
   }
+
+    fun searchList(text: String) {
+        val query = db.collection("meals").orderBy("name").startAt(text).endAt(text + "\ufaff")
+        val option =
+            FirestoreRecyclerOptions.Builder<Meal>().setQuery(query, Meal::class.java).build()
+        ListAdapter(option)
+        Adapter!!.startListening()
+        recyclerView.adapter = Adapter
+        Adapter!!.notifyDataSetChanged()
+    }
 
 
     class meal_item(view: View) : RecyclerView.ViewHolder(view) {
@@ -274,7 +224,86 @@ private var _binding: FragmentMenuBinding? = null
 
     }
 
+fun ListAdapter(option: FirestoreRecyclerOptions<Meal>){
+    Adapter = object : FirestoreRecyclerAdapter<Meal, meal_item>(option) {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): meal_item {
+            var view = LayoutInflater.from(context)
+                .inflate(R.layout.show_meals, parent, false)
+            return meal_item(view)
+        }
 
+        override fun onBindViewHolder(holder: meal_item, position: Int, model: Meal) {
+            val name = model.name
+            val description = model.description
+            val resturantName = model.resturantName
+            val rate = model.rate
+            val image = model.image
+            val price = model.price
+
+            holder.name.text = name
+            holder.price.text = price.toString()
+            holder.description.text = description
+            holder.resturantName.text = resturantName
+            holder.rate.rating = rate
+
+            //                Delete
+            holder.image.setOnLongClickListener { _ ->
+                Toast.makeText(context, typeAccount, Toast.LENGTH_SHORT).show()
+                if (typeAccount == "admin") {
+                    val dilalog = AlertDialog.Builder(context)
+                    dilalog.setTitle("Delete Account")
+                    dilalog.setMessage("You Are Sure Delete Account ??")
+                    dilalog.setPositiveButton("Delete") { dialog, which ->
+                        // Do something when the positive button is clicked
+                        getidDelete(model.name)
+                        Toast.makeText(context, "Deleted Successfully", Toast.LENGTH_SHORT).show()
+                        dialog.dismiss()
+
+                    }
+                    dilalog.setNegativeButton("Cancel") { dialog, which ->
+                        // Do something when the negative button is clicked
+                        dialog.dismiss()
+
+                    }
+                    dilalog.show()
+                }
+
+                true
+            }
+
+            holder.edit.setOnClickListener {
+                val i = Intent(context, EditMeal::class.java)
+                i.putExtra("name", model.name)
+                startActivity(i)
+
+            }
+
+            holder.order.setOnClickListener{
+                val i = Intent(context, OrderDetailes::class.java)
+                i.putExtra("name", model.name)
+                getIDMeal(model.name)
+                i.putExtra("id", MEAL_ID)
+                startActivity(i)
+            }
+            //      ======== Start cheked acount type to permations ===
+            val  email = requireActivity().getSharedPreferences("user" , Context.MODE_PRIVATE).getString("email" , "").toString()
+            if (email == "admin@gmail.com") {
+                holder.edit.visibility = View.VISIBLE
+            }
+            else {
+                holder.edit.visibility = View.GONE
+            }
+            //      ======== End cheked acount type to permations ===
+
+
+            DwnloadImage(image, holder.image)
+
+        }
+
+
+    }
+
+}
 
 //    Get ID Meal
 fun getIDMeal(names : String ){
@@ -296,4 +325,34 @@ fun getIDMeal(names : String ){
             Log.w(ContentValues.TAG, "Error getting documents.", exception)
         }
 }
+
+    override fun onResume() {
+        super.onResume()
+        db = Firebase.firestore
+        val recycler = binding.rvMeals
+
+        val query = db.collection("meals").orderBy("rate", Query.Direction.DESCENDING)
+
+        val  email = requireActivity().getSharedPreferences("user" , Context.MODE_PRIVATE).getString("email" , "").toString()
+
+
+//      ======== Start cheked acount type to permations ===
+        if (email == "admin@gmail.com") {
+            binding.btnAdd.visibility = View.VISIBLE
+        }
+        else {
+            binding.btnAdd.visibility = View.GONE
+        }
+//      ======== End cheked acount type to permations ===
+
+
+
+//        Build Recycler View
+        val option =
+            FirestoreRecyclerOptions.Builder<Meal>().setQuery(query, Meal::class.java)
+                .build()
+
+//        Adapter Take option
+        ListAdapter(option)
+    }
 }

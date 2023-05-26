@@ -6,31 +6,31 @@
     android:layout_height="match_parent"
     tools:context=".ui.resturant.ResturantFragment">
 
-
-<!--    <androidx.appcompat.widget.SearchView-->
-<!--        android:id="@+id/ss"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginTop="16dp"-->
-<!--        android:background="@drawable/lavender_border"-->
-<!--        android:focusable="false"-->
-<!--        app:closeIcon="@drawable/ic_clear"-->
-<!--        app:iconifiedByDefault="false"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintHorizontal_bias="0.0"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:queryHint="Search..."-->
-<!--        app:searchHintIcon="@null"-->
-<!--        app:searchIcon="@drawable/ic_search" />-->
+    <SearchView
+        android:id="@+id/search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10sp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/lavender_border"
+        android:closeIcon="@drawable/baseline_clear_24"
+        android:focusable="false"
+        android:iconifiedByDefault="false"
+        android:queryHint="Search..."
+        android:searchHintIcon="@null"
+        android:searchIcon="@drawable/baseline_search_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView2"
-        android:layout_width="0dp"
-        android:layout_height="500dp"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_marginTop="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/search" />
 
     <Button
         android:id="@+id/btnAdd"
@@ -44,4 +44,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/recyclerView2"
         app:layout_constraintVertical_bias="0.0" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

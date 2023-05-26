@@ -18,6 +18,7 @@ import com.example.restaurantmanagement.EditResturant
 import com.example.restaurantmanagement.R
 import com.example.restaurantmanagement.add_resturant2
 import com.example.restaurantmanagement.databinding.FragmentResturantBinding
+import com.example.restaurantmanagement.model.Order
 import com.example.restaurantmanagement.model.Resturant
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
@@ -37,7 +38,7 @@ class ResturantFragment : Fragment() {
     val storage = FirebaseStorage.getInstance()
     var typeAccount: String = ""
     private lateinit var dataList: ArrayList<Resturant>
-
+lateinit var recycler : RecyclerView
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -62,7 +63,7 @@ class ResturantFragment : Fragment() {
         }
 //        ==================================Start Adapter==================================
         db = Firebase.firestore
-        val recycler = binding.recyclerView2
+         recycler = binding.recyclerView2
 
         val query = db.collection("resturants").orderBy("rate", Query.Direction.DESCENDING)
 
@@ -70,88 +71,24 @@ class ResturantFragment : Fragment() {
         val option =
             FirestoreRecyclerOptions.Builder<Resturant>().setQuery(query, Resturant::class.java)
                 .build()
-
-//        Adapter Take option
-
-            Adapter = object : FirestoreRecyclerAdapter<Resturant, resturant_item>(option)  {
-                var dataList: List<Resturant> = listOf() // قائمة البحث الجديدة
-
-
-
-                override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): resturant_item {
-                var view = LayoutInflater.from(context)
-                    .inflate(R.layout.show_resturants, parent, false)
-                return resturant_item(view)
-            }
-
-            override fun onBindViewHolder(holder: resturant_item, position: Int, model: Resturant) {
-                val name = model.name
-                val description = model.description
-                val location = model.loation
-                val rate = model.rate
-                val image = model.image
-
-                holder.name.text = name
-                holder.description.text = description
-                holder.location.text = location
-                holder.rate.rating = rate
-
-//                Delete
-                holder.root.setOnLongClickListener { _ ->
-                    if (typeAccount == "admin") {
-                        val dilalog = AlertDialog.Builder(context)
-                        dilalog.setTitle("Delete Account")
-                        dilalog.setMessage("You Are Sure Delete Account ??")
-                        dilalog.setPositiveButton("Delete") { dialog, which ->
-                            // Do something when the positive button is clicked
-                            getidDelete(model.name)
-                            Toast.makeText(context, "Deleted Successfully", Toast.LENGTH_SHORT)
-                                .show()
-                            dialog.dismiss()
-
-
-                        }
-                        dilalog.setNegativeButton("Cancel") { dialog, which ->
-                            // Do something when the negative button is clicked
-                            dialog.dismiss()
-
-                        }
-                        dilalog.show()
-                    }
-
-                    true
-                }
-
-                val  email = requireActivity().getSharedPreferences("user" , Context.MODE_PRIVATE).getString("email" , "").toString()
-
-                if (email == "admin@gmail.com") {
-
-                    holder.edit.visibility = View.VISIBLE
-                }
-                else {
-                    holder.edit.visibility = View.GONE
-                }
-                holder.edit.setOnClickListener {
-
-
-                    val i = Intent(context, EditResturant::class.java)
-                    i.putExtra("name", model.name)
-                    startActivity(i)
-
-                }
-
-                DwnloadImage(image, holder.image)
-
-            }
-
-
-        }
+        ListAdapter(option)
 
         recycler.layoutManager = LinearLayoutManager(context)
         recycler.adapter = Adapter
 
 
+        binding.search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(p0: String?): Boolean {
+                return false
+            }
 
+            override fun onQueryTextChange(p0: String?): Boolean {
+
+                searchList(p0.toString())
+                return true
+            }
+
+        })
 
             //     ==================================End Adapter==================================
 
@@ -232,7 +169,15 @@ class ResturantFragment : Fragment() {
         }
     }
 
-
+    fun searchList(text: String) {
+        val query = db.collection("resturants").orderBy("name").startAt(text).endAt(text + "\ufaff")
+        val option =
+            FirestoreRecyclerOptions.Builder<Resturant>().setQuery(query, Resturant::class.java).build()
+        ListAdapter(option)
+        Adapter!!.startListening()
+        recycler.adapter = Adapter
+        Adapter!!.notifyDataSetChanged()
+    }
     //    ====get type acount=============
     private fun getUser(emails: String) {
         var db = Firebase.firestore
@@ -275,6 +220,87 @@ class ResturantFragment : Fragment() {
     //    Delete Function
     fun delete(id: String) {
         db.collection("resturants").document(id).delete()
+
+    }
+
+    fun ListAdapter(option: FirestoreRecyclerOptions<Resturant>){
+
+
+//        Adapter Take option
+
+        Adapter = object : FirestoreRecyclerAdapter<Resturant, resturant_item>(option)  {
+            var dataList: List<Resturant> = listOf() // قائمة البحث الجديدة
+
+
+
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): resturant_item {
+                var view = LayoutInflater.from(context)
+                    .inflate(R.layout.show_resturants, parent, false)
+                return resturant_item(view)
+            }
+
+            override fun onBindViewHolder(holder: resturant_item, position: Int, model: Resturant) {
+                val name = model.name
+                val description = model.description
+                val location = model.loation
+                val rate = model.rate
+                val image = model.image
+
+                holder.name.text = name
+                holder.description.text = description
+                holder.location.text = location
+                holder.rate.rating = rate
+
+//                Delete
+                holder.root.setOnLongClickListener { _ ->
+                    if (typeAccount == "admin") {
+                        val dilalog = AlertDialog.Builder(context)
+                        dilalog.setTitle("Delete Account")
+                        dilalog.setMessage("You Are Sure Delete Account ??")
+                        dilalog.setPositiveButton("Delete") { dialog, which ->
+                            // Do something when the positive button is clicked
+                            getidDelete(model.name)
+                            Toast.makeText(context, "Deleted Successfully", Toast.LENGTH_SHORT)
+                                .show()
+                            dialog.dismiss()
+
+
+                        }
+                        dilalog.setNegativeButton("Cancel") { dialog, which ->
+                            // Do something when the negative button is clicked
+                            dialog.dismiss()
+
+                        }
+                        dilalog.show()
+                    }
+
+                    true
+                }
+
+                val  email = requireActivity().getSharedPreferences("user" , Context.MODE_PRIVATE).getString("email" , "").toString()
+
+                if (email == "admin@gmail.com") {
+
+                    holder.edit.visibility = View.VISIBLE
+                }
+                else {
+                    holder.edit.visibility = View.GONE
+                }
+                holder.edit.setOnClickListener {
+
+
+                    val i = Intent(context, EditResturant::class.java)
+                    i.putExtra("name", model.name)
+                    startActivity(i)
+
+                }
+
+                DwnloadImage(image, holder.image)
+
+            }
+
+
+        }
 
     }
 }

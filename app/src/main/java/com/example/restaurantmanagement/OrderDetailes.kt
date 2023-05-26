@@ -107,13 +107,6 @@ class OrderDetailes : AppCompatActivity() {
         }
 
     }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        startActivity(Intent(this , MainActivity::class.java))
-    }
-
-
     //createOrderTable
     private fun createOrderTable(email : String, name : String, count : String, totalPrice : Double, price : Double) {
         val data = hashMapOf<String, Any>(
@@ -126,8 +119,10 @@ class OrderDetailes : AppCompatActivity() {
         )
         db = Firebase.firestore
         db.collection("orders").add(data).addOnSuccessListener {
+            val name = intent.getStringExtra("name")
             val i= Intent(this@OrderDetailes , OrderList::class.java)
-            i.putExtra("alltotal",alltotal)
+            i.putExtra("alltotal",binding.total.text.toString())
+            i.putExtra("name",name)
             startActivity(i)
         }
     }
